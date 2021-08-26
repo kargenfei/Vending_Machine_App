@@ -3,7 +3,7 @@ import VendingMachine, {
     depositMoreMoneyMsg,
     itemUnavailableMsg,
     wrongDenominationMsg
-} from "../src/VendingMachine";
+} from "../src/main";
 import Item from "../src/Item";
 
 const chocolate = new Item('Chocolate', 50);
