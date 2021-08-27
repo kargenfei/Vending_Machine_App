@@ -1,4 +1,20 @@
-img {
-  height: 200px;
-  width: 200 px;
+
+h1{
+  color: black;
+  background-color:pink ;
+  text-align: center;
+  font-family:Arial, Helvetica, sans-serif
+
+
+}
+body{
+  background-color: pink;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 25px;
+  text-align: center;
+}
+
+img{
+  height: 100px;
+  width: 100px;
 }

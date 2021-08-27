@@ -1,9 +1,9 @@
-import VendingMachine, {
+/*import VendingMachine, {
     denominations,
     depositMoreMoneyMsg,
     itemUnavailableMsg,
     wrongDenominationMsg
-} from "../src/main";
+} from "../src/VendingMachine";
 import Item from "../src/Item";
 
 const chocolate = new Item('Chocolate', 50);
@@ -142,4 +142,4 @@ describe('Vending Machine', () => {
         machine.register = bank;
     }
 
-})
+})*/

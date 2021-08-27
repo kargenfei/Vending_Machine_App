@@ -5,14 +5,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <script src="bundle.js"></script>
-
     <title>Document</title>
   </head>
   <body>
     <h1>Vending Machine</h1>
-    <img src="https://images.squarespace-cdn.com/content/v1/5886ac0ec534a517c8cf9514/1533249811812-UM1O70RDYL6939YEYJW6/17200237_1503907102955100_447960939_o.jpg?format=1500w" />
-    <button id= "getChangeButton">Get Change</button>
-    
+    <div id="message"></div>
+    <div id="items"></div>
+
+    <h2 class="balanceinquiry">Balance Inquiry:</h2>
+    <div id="deposit"></div>
+    <div id="showdeposit"></div>
+
+    <button id="depositmoneybutton">Deposit Money</button>
+    <input id="depositamount" type="text" />
+    <br />
+    <button id="selectitembutton">Select Item</button>
+    <button id="getchangebutton">Get Change</button>
+
+    <script src="bundle.js"></script>
   </body>
 </html>
+
+<!--
+    <button id="sendten">10</button>
+    <button id="sendtwenty">20</button>
+    <button id="sendfifty">50</button>
+    <button id="sendhundred">100</button>
+    <button id="sendfivehundred">500</button> 
+  <divid="depositreturn"></h4>-->

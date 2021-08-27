@@ -1,123 +1,93 @@
-
-import { SourceMapDevToolPlugin } from "webpack";
+import { depositConfirmMsg, VendingMachine } from "./VendingMachine";
 import Item from "./Item";
+import snackData from "./snacks";
+import { isNamedExportBindings } from "typescript";
+let vendingMachine = new VendingMachine();
+let itemsDiv = document.getElementById("items") as HTMLDivElement;
 
-// Consistency: changing these values won't break any tests!!! :)
-export const denominations = new Set([10, 20, 50, 100, 500]);
-export const wrongDenominationMsg = `Only ${denominations.values()} accepted`;
-export const itemUnavailableMsg = 'Item is unavailable.';
-export const depositMoreMoneyMsg = 'Deposit more money.';
-export const depositConfirmMsg = 'You have deposited $';
-
-export default class VendingMachine {
-    public selections: Item[] = [];
-    public register: Map<number, number> = new Map();
-    public currentPurchases: Item[] = [];
-
-    private _currentMessage: string | null = null;
-    private _deposit: number = 0;
-
-    get depositConfirmation() {
-        return depositConfirmMsg + this.deposit;
-    }
-
-    get deposit() {
-        return this._deposit;
-    }
-
-    get currentMessage() {
-        return this._currentMessage;
-    }
-
-    display() {
-        return `$${this.deposit}`;
-    }
-
-    insert(money: number) {
-        if (VendingMachine.isValidCurrency(money)) {
-            this._deposit += money;
-            this.addToRegister(money);
-            this._currentMessage = this.depositConfirmation;
-        } else {
-            this._currentMessage = wrongDenominationMsg;
-        }
-    }
-
-    selectItem(selection: Item): Item {
-        let item = this.selections.filter(item => item.name == selection.name)[0];
-        if (!this.itemAvailable(selection)) {
-            this._currentMessage = itemUnavailableMsg;
-            return item;
-        }
-        if(this.deposit < selection.price) {
-            this._currentMessage = depositMoreMoneyMsg;
-        }
-        this.currentPurchases.push(selection);
-        return item;
-    }
-
-    getChange() {
-        let totalPrice = this.currentTotal()
-        let change: any[] = [];
-
-        this.register.forEach((quantity, bill) => {
-            if (totalPrice == 0) return;
-            if (quantity > 0 && totalPrice >= bill) {
-                let billCount = totalPrice / bill;
-                billCount = this.updateBillQuantity(bill, billCount);
-                totalPrice -= bill * billCount;
-                change.push([bill, Math.floor(billCount)]);
-            }
-        });
-        this._deposit = 0;
-        return totalPrice > 0 ? this.cancel() : change;
-    }
-
-    refund() {
-        if (this.currentPurchases.length == 0) return this.deposit;
-        return this.deposit - this.currentTotal();
-    }
-
-    cancel() {
-        this.currentPurchases = [];
-        this._deposit = 0;
-    }
-
-    currentTotal() {
-        return this.currentPurchases
-            .map(item => item.price)
-            .reduce((acc, price) => acc + price);
-    }
-
-    addItem(item: Item) {
-        this.selections.push(item);
-    }
-
-    private updateBillQuantity(bill: number, usedQuantity: number) {
-        let currentQuantity = this.register.get(bill);
-        if (currentQuantity && usedQuantity > currentQuantity) {
-            usedQuantity = currentQuantity
-        } else if (currentQuantity && usedQuantity < currentQuantity) {
-            this.register.set(bill, currentQuantity - usedQuantity);
-        }
-        return usedQuantity;
-    }
-
-    private addToRegister(bill: number) {
-        let billQuantity = this.register.get(bill);
-        if (this.register.has(bill) && billQuantity) {
-            this.register.set(bill, billQuantity + 1)
-        } else {
-            this.register.set(bill, 1);
-        }
-    }
-
-    private static isValidCurrency(money: number) {
-        return denominations.has(money);
-    }
-
-    private itemAvailable(item: Item) {
-        let found = this.selections.filter(current => current.name == item.name)[0];
-        return found && found.quantity > 0;
-    }
+let items: Item[] = [];
+let totalDeposit = 0;
+for (let snack of snackData) {
+  let item = new Item(snack.name, snack.price, snack.quantity, snack.image);
+  items.push(item);
 }
+
+function showItems(items: Item[]): void {
+  items.forEach((item) => {
+    let newDiv = document.createElement("div");
+    newDiv.setAttribute("class", "item");
+    newDiv.innerHTML = `Name: ${item.name}, Price: ${item.price}, Quantity: ${item.quantity},<img src="images/${item.image}" />`;
+    itemsDiv.appendChild(newDiv);
+  });
+}
+showItems(items);
+
+function depositMoney() {
+  const depAmtInput = document.getElementById(
+    "depositamount"
+  ) as HTMLInputElement;
+  let deposit = parseInt(depAmtInput.value);
+  totalDeposit += deposit;
+  console.log(totalDeposit);
+  vendingMachine.insert(deposit);
+  vendingMachine.depositConfirmation;
+  let aDiv = document.getElementById("showdeposit") as HTMLInputElement;
+
+  showDeposit();
+}
+
+function showDeposit() {
+  let secondDiv = document.getElementById("deposit") as HTMLInputElement;
+  secondDiv.innerHTML = `User Balance: ${totalDeposit}`;
+  vendingMachine.display();
+}
+//showDeposit();
+
+function wireButtons() {
+  let moneyDepositButton = document.getElementById(
+    "depositmoneybutton"
+  ) as HTMLButtonElement;
+  moneyDepositButton.addEventListener("click", depositMoney);
+}
+wireButtons();
+
+function selectFoodItem(this: HTMLDivElement) {
+  //let itemCounter=0;
+  let splitString = this.innerText.split(",");
+  let itemName = splitString[0].split(": ");
+  console.log(itemName);
+  items.forEach((item) => {
+    if (itemName[1] === item.name) {
+      //let totalPrice=itemCounter*item.price;
+      // console.log(totalPrice);
+      //console.log(itemCounter);
+      //have enough money , deposit more, enjoy
+      let messageDiv = document.getElementById("message")!;
+      messageDiv.innerText = `${item.name}, ${item.price}`;
+      if (totalDeposit >= item.price) {
+        if (item.quantity == 0) {
+          let messageDiv = document.getElementById("message")!;
+          messageDiv.innerText = "Item is Out of Stock!";
+        }
+        if (item.quantity != 0) {
+          item.quantity--;
+        }
+        console.log(item.quantity);
+        console.log("you have enough money");
+      }
+      if (totalDeposit <= item.price) {
+        let messageDiv = document.getElementById("message")!;
+        messageDiv.innerText = "Please Insert More Money!";
+      }
+    }
+  });
+}
+
+function setupDynamicDogClickHandler(): void {
+  let itemDivArray = document.getElementsByClassName("item");
+  for (let i = 0; i < itemDivArray.length; i++) {
+    let div = itemDivArray[i] as HTMLDivElement;
+    div.addEventListener("click", selectFoodItem);
+  }
+}
+setupDynamicDogClickHandler();
